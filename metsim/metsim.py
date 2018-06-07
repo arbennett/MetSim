@@ -433,8 +433,7 @@ class MetSim(object):
         total_precip = (cnst.DAYS_PER_YEAR * total_precip.rolling(
             time=90).mean().sel(time=slice(self.params['start'],
                                            self.params['stop'])))
-
-        self.met_data['seasonal_prec'] = total_precip
+        self.met_data['seasonal_prec'] = total_precip.drop('lat')
 
         # Smoothed daily temperature range
         trailing = self.state['t_max'] - self.state['t_min']
@@ -445,7 +444,8 @@ class MetSim(object):
             raise ValueError("Daily maximum temperature lower"
                              " than daily minimum temperature!")
         sm_dtr = xr.concat([trailing, dtr], dim='time').load()
-        sm_dtr = sm_dtr.rolling(time=30).mean().drop(record_dates, dim='time')
+        sm_dtr = (sm_dtr.rolling(time=30).mean()
+                         .drop(record_dates, dim='time').drop('lat'))
         self.met_data['dtr'] = dtr
         self.met_data['smoothed_dtr'] = sm_dtr
 
