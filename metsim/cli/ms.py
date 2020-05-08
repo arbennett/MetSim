@@ -24,6 +24,7 @@ import json
 import logging
 import os
 import sys
+import xarray as xr
 from collections import OrderedDict
 from configparser import ConfigParser
 
@@ -73,6 +74,7 @@ def init(opts):
     conf['domain_vars'] = invert_dict(OrderedDict(config['domain_vars']))
     conf['state_vars'] = invert_dict(OrderedDict(config['state_vars']))
     conf['chunks'] = OrderedDict(config['chunks'])
+    conf['chunks'] = {k: int(v) for k, v in conf['chunks'].items()}
     if 'constant_vars' in config:
         conf['constant_vars'] = OrderedDict(config['constant_vars'])
 
@@ -102,7 +104,8 @@ def main():
     from metsim.metsim import MetSim
     setup = init(parse(sys.argv[1:]))
     ms = MetSim(setup)
-    ms.run()
+    ds = ms.run()
+    ms.write(ds)
 
 
 if __name__ == '__main__':

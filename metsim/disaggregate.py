@@ -497,7 +497,7 @@ def relative_humidity(vapor_pressure: np.array,
     rh:
         A sub-daily timeseries of relative humidity
     """
-    rh = (cnst.MAX_PERCENT * cnst.MBAR_PER_BAR * (vapor_pressure / svp(temp)))
+    rh = np.nan_to_num(cnst.MAX_PERCENT * cnst.MBAR_PER_BAR * (vapor_pressure / svp(temp)))
     rh[rh > cnst.MAX_PERCENT] = cnst.MAX_PERCENT
     return rh
 
@@ -539,7 +539,7 @@ def vapor_pressure(vp_daily: np.array, temp: np.array, t_t_min: np.array,
     # Account for situations where vapor pressure is higher than
     # saturation point
     vp_sat = svp(temp) / cnst.MBAR_PER_BAR
-    vp_disagg = np.where(vp_sat < vp_disagg, vp_sat, vp_disagg)
+    vp_disagg = np.minimum(vp_sat, vp_disagg)
     return vp_disagg
 
 
